@@ -199,14 +199,12 @@
           setTimeout(() => t.classList.contains("is-leaving") && t.classList.add("is-hidden"), reduced ? 0 : 320);
         }
       });
-      // the first visible tile spans the full width
+      // the first visible tile spans the full width, and so does the last one if it would sit alone
       setTimeout(() => {
-        let first = true;
-        tiles.forEach((t) => {
-          const visible = !t.classList.contains("is-hidden");
-          t.classList.toggle("wide", visible && first);
-          if (visible) first = false;
-        });
+        const visible = tiles.filter((t) => !t.classList.contains("is-hidden"));
+        const n = visible.length;
+        tiles.forEach((t) => t.classList.remove("wide"));
+        visible.forEach((t, i) => t.classList.toggle("wide", i === 0 || (i === n - 1 && (n - 1) % 2 === 1)));
         requestTick();
       }, reduced ? 0 : 330);
     }));

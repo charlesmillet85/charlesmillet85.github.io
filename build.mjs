@@ -1,6 +1,10 @@
 // Builds the whole site from data/apps.mjs.  Run:  node build.mjs
 import { writeFileSync, mkdirSync } from "node:fs";
-import { site, apps } from "./data/apps.mjs";
+import { site, apps as allApps } from "./data/apps.mjs";
+
+// Live apps first, then coming soon, then open-source projects (order kept within each group).
+const rank = { live: 0, soon: 1, open: 2 };
+const apps = [...allApps].sort((a, b) => rank[a.status] - rank[b.status]);
 
 const esc = (s = "") =>
   String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -105,21 +109,30 @@ const layersMarkup = (root, a, tilt = true) =>
 
 /* ---------- home page ---------- */
 const spots = [
-  { x: 0, y: -24, r: 0, z: 6 },
-  { x: -140, y: 14, r: -14, z: 5 },
-  { x: 140, y: 14, r: 12, z: 5 },
-  { x: -262, y: 74, r: -22, z: 4 },
-  { x: 262, y: 74, r: 20, z: 4 },
-  { x: 0, y: 112, r: 8, z: 3 },
+  { x: 0, y: -34, r: 0, z: 7 },
+  { x: -140, y: 4, r: -14, z: 6 },
+  { x: 140, y: 4, r: 12, z: 6 },
+  { x: -262, y: 64, r: -22, z: 5 },
+  { x: 262, y: 64, r: 20, z: 5 },
+  { x: -76, y: 116, r: -6, z: 4 },
+  { x: 76, y: 116, r: 8, z: 4 },
+  { x: 0, y: -150, r: 4, z: 3 },
 ];
 
 const tileMedia = {
   "home-glass": (root) => `<img src="${root}assets/media/home-ecosystem.webp" alt="Home Glass on iPhone, iPad, Mac and Apple Vision Pro" loading="lazy">`,
   "hello-duo": (root) => `<img src="${root}assets/media/hello-family.webp" alt="The Hello Duo characters" loading="lazy" style="object-fit:contain">`,
   "folio-player-plus": (root) => `<img src="${root}assets/media/folio-still-30.webp" alt="Folio Player Plus library" loading="lazy">`,
-  "relief-player": (root, a) => layersMarkup(root, a, false),
   "spatial-posts": (root) => `<img src="${root}assets/media/posts-timeline.webp" alt="Spatial Posts on Apple Vision Pro" loading="lazy">`,
 };
+const tileFor = (root, a) => {
+  if (tileMedia[a.slug]) return tileMedia[a.slug](root, a);
+  if (a.tileImage) return `<img src="${root}assets/${a.tileImage}" alt="${esc(a.name)}" loading="lazy">`;
+  if (a.hero.type === "layers") return layersMarkup(root, a, false);
+  return "";
+};
+// The first tile is full width; so is the last one when it would otherwise sit alone in its row.
+const isWide = (i, n) => i === 0 || (i === n - 1 && (n - 1) % 2 === 1);
 
 const home = () => {
   const root = "./";
@@ -156,7 +169,7 @@ ${gnav(root, null, false)}
       </div>
       <div class="tiles">
         ${storeApps.map((a, i) => `
-        <a class="tile theme-${a.theme} reveal scale${i === 0 ? " wide" : ""}" href="apps/${a.slug}/" data-platforms="${esc(a.platforms.join("|"))}" style="${accentVars(a)};--d:${(i % 2) * 0.08}s">
+        <a class="tile theme-${a.theme} reveal scale${isWide(i, storeApps.length) ? " wide" : ""}" href="apps/${a.slug}/" data-platforms="${esc(a.platforms.join("|"))}" style="${accentVars(a)};--d:${(i % 2) * 0.08}s">
           <span class="glow" aria-hidden="true"></span>
           <img class="tile-icon" src="assets/${a.icon}" alt="">
           ${a.status === "live" ? '<span class="badge">On the App Store</span>' : '<span class="badge">Coming soon</span>'}
@@ -164,7 +177,7 @@ ${gnav(root, null, false)}
           <p class="lead">${esc(a.tagline)}</p>
           <span class="btns"><span class="link">Learn more</span></span>
           <span class="platforms muted">${esc(a.platforms.join(" · "))}</span>
-          <span class="tile-media${a.hero.type === "layers" ? " layers-mini" : ""}">${tileMedia[a.slug] ? tileMedia[a.slug](root, a) : ""}</span>
+          <span class="tile-media${!tileMedia[a.slug] && !a.tileImage && a.hero.type === "layers" ? " layers-mini" : ""}">${tileFor(root, a)}</span>
         </a>`).join("")}
       </div>
     </div>
