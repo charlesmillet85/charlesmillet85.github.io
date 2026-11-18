@@ -15,6 +15,7 @@ const ALL_PLATFORMS = ["iPhone", "iPad", "Mac", "Apple TV", "Apple Vision Pro"];
 
 const icon = {
   apple: '<svg viewBox="0 0 14 17" width="14" height="17" fill="currentColor" aria-hidden="true"><path d="M11.6 9c0-2 1.7-3 1.8-3.1-1-1.4-2.5-1.6-3-1.7-1.3-.1-2.5.8-3.2.8-.6 0-1.6-.7-2.7-.7C3.1 4.3 1.8 5.1 1 6.4-.5 9-.4 13 1.1 15.2c.7 1 1.6 2.2 2.7 2.2 1 0 1.5-.7 2.8-.7s1.6.7 2.7.7c1.1 0 1.9-1.1 2.6-2.1.8-1.2 1.1-2.3 1.1-2.4 0 0-2.4-.9-2.4-3.9ZM9.5 2.9c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.5.6-1 1.6-.9 2.6 1 .1 1.9-.5 2.5-1.2Z"/></svg>',
+  sound: '<svg viewBox="0 0 20 20" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M3 7.5h3l4.2-3.6c.5-.4 1.3 0 1.3.6v11c0 .6-.8 1-1.3.6L6 12.5H3a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1Z"/><path d="M14 6.5a5 5 0 0 1 0 7M16.3 4.2a8.2 8.2 0 0 1 0 11.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
   play: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="currentColor"/><path d="M13 10.5v11l9-5.5-9-5.5Z" fill="#fff"/></svg>',
   left: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3 5 9l6 6"/></svg>',
   right: '<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 3 6 6-6 6"/></svg>',
@@ -213,12 +214,14 @@ const appPage = (a) => {
     ["overview", "Overview"],
     ["features", "Features"],
     a.story && ["devices", "Devices"],
+    a.cast && ["cast", "Characters"],
     (a.gallery || a.film) && ["gallery", a.film ? "Film" : "Gallery"],
     a.faq && ["faq", "FAQ"],
   ].filter(Boolean);
 
   const heroMedia = (() => {
     const h = a.hero;
+    if (h.type === "none") return "";
     if (h.type === "layers")
       return `<div class="expand-inner"><div class="layers-stage" data-tilt-zone>${layersMarkup(root, a)}</div></div>`;
     if (h.type === "video")
@@ -237,7 +240,7 @@ const appPage = (a) => {
     canonical: `${site.url}apps/${a.slug}/`,
     image: `assets/${a.hero.poster || a.gallery?.[0]?.src || a.icon}`,
   })}
-<body class="theme-${a.theme}" style="${accentVars(a)}">
+<body class="theme-${a.theme}${a.compact ? " compact" : ""}" style="${accentVars(a)}">
 ${gnav(root, a.slug, a.theme === "dark")}
 <div class="lnav">
   <div class="wrap">
@@ -249,10 +252,17 @@ ${gnav(root, a.slug, a.theme === "dark")}
   </div>
 </div>
 <main>
+  ${a.topFilm ? `
+  <section class="top-film" aria-label="${esc(a.topFilm.label)}">
+    <div class="top-film-inner">
+      <video data-loop data-soundfilm muted playsinline loop autoplay preload="auto" poster="${A(a.topFilm.poster)}"><source src="${A(a.topFilm.src)}" type="video/mp4"></video>
+      <button class="sound-btn" aria-pressed="false">${icon.sound} <span>Sound on</span></button>
+    </div>
+  </section>` : ""}
   <section class="app-hero" id="overview" data-tilt-zone>
     <div class="wrap">
       <img class="app-icon" src="${A(a.icon)}" alt="${esc(a.name)} icon" data-tilt="16">
-      <p class="kicker fade-up" style="--d:.1s">${esc(a.fullName || a.name)}</p>
+      <p class="kicker fade-up" style="--d:.1s">${esc(a.kicker || a.fullName || a.name)}</p>
       <h1 class="display">${a.headline.split("\n").map((l, i) => `<span class="hero-line"><span style="--d:${0.15 + i * 0.12}s">${esc(l)}</span></span>`).join("")}</h1>
       <p class="lead fade-up" style="--d:.45s">${esc(a.intro)}</p>
       <div class="btns fade-up" style="--d:.55s">
@@ -261,10 +271,28 @@ ${gnav(root, a.slug, a.theme === "dark")}
       </div>
       <ul class="platform-list muted fade-up" style="--d:.6s">${a.platforms.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>
     </div>
-    <div class="expand" data-scrub="expand">
+    ${heroMedia ? `<div class="expand" data-scrub="expand">
       ${heroMedia}
-    </div>
+    </div>` : ""}
   </section>
+
+  ${a.cast ? `
+  <section class="section tight" id="cast">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <h2 class="h2">${esc(a.castTitle || "The characters.")}</h2>
+        ${a.castLead ? `<p class="lead muted">${esc(a.castLead)}</p>` : ""}
+      </div>
+      <div class="cast">
+        ${a.cast.map((c, i) => `
+        <article class="cast-card reveal${i === 0 ? " star" : ""}" style="--c:${c.color};--d:${(i % 4) * 0.06}s">
+          <img src="${A(c.img)}" alt="${esc(c.name)}" loading="lazy" width="200" height="200">
+          <h3>${esc(c.name)}</h3>
+          <ul>${c.lines.map((l, j) => `<li><span>${["Unfold", "Fold", "Unlock"][j] || ""}</span>“${esc(l)}”</li>`).join("")}</ul>
+        </article>`).join("")}
+      </div>
+    </div>
+  </section>` : ""}
 
   <section class="section">
     <div class="wrap">

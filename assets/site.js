@@ -106,6 +106,22 @@
     });
   });
 
+  /* ---------- the film first: muted until asked, then from the start with sound ---------- */
+  $$("video[data-soundfilm]").forEach((v) => {
+    const btn = v.parentElement.querySelector(".sound-btn");
+    if (!btn) return;
+    let heard = false;
+    btn.addEventListener("click", () => {
+      const on = v.muted;
+      v.muted = !on;
+      if (on && !heard) { heard = true; v.currentTime = 0; }
+      v.dataset.userPaused = "0";
+      v.play().catch(() => {});
+      btn.setAttribute("aria-pressed", String(on));
+      btn.querySelector("span").textContent = on ? "Sound off" : "Sound on";
+    });
+  });
+
   /* ---------- sticky story: the image follows the active step ---------- */
   $$(".story").forEach((story) => {
     const steps = $$(".story-step", story);
