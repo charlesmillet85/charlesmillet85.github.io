@@ -78,8 +78,6 @@ export const apps = [
     topFilm: { src: "media/hello-film-v8.mp4", poster: "media/hello-film-v8.webp", label: "Hello Duo film" },
     intro:
       "A silly little app for your iPhone Duo, made for a laugh. Fold it or unfold it, and your phone says something: grumpy, sweet, very British or completely unhinged.",
-    statement:
-      "No chatbot. No pop-ups. Two Shortcuts automations, set up once with a guide, and your Duo says its line every time you open or close it.",
     hero: { type: "none", poster: "media/hello-film-v8.webp" },
     castTitle: "Thirteen personalities.",
     castLead: "Each one with its own voice and its own lines. Here's what they say when you unfold, fold and unlock.",
@@ -99,10 +97,10 @@ export const apps = [
       { img: "media/cast/influencer.webp", name: "The influencer iPhone", color: "#c7339e", lines: ["Okay, hi besties!", "Oh my God, not my good side.", "Hi! Did you see my story?"] }
     ],
     features: [
-      { title: "13 personalities", text: "Grumpy, sunny, very British, AI, needy, teenage, bossy, smooth, boomer, gym bro, posh, Karen and influencer. Male and female voices for most of them. Or let Shuffle pick a new one each time." },
-      { title: "Set up in a minute", text: "A guide, narrated by one of the characters, adds the two Shortcuts automations: one for unfolding, one for folding." },
-      { title: "You decide when", text: "Every time, or once every few hours. On unfold, fold or unlock. Only at the times of day you choose, at the volume you choose." },
-      { title: "Free to try", text: "The sunny iPhone and the gym bro in full, plus a taste of the grumpy one. Then $0.99 per character, or unlock everyone at once. No subscription, no ads, no account." },
+      { title: "13 personalities", img: "media/cast/feature-cast.webp", text: "Grumpy, sunny, very British, AI, needy, teenage, bossy, smooth, boomer, gym bro, posh, Karen and influencer. Male and female voices for most of them. Or let Shuffle pick a new one each time." },
+      { title: "Set up in a minute", img: "media/cast/feature-setup.webp", text: "A guide, narrated by one of the characters, adds the two Shortcuts automations: one for unfolding, one for folding." },
+      { title: "You decide when", img: "media/cast/feature-when.webp", text: "Every time, or once every few hours. On unfold, fold or unlock. Only at the times of day you choose, at the volume you choose." },
+      { title: "Free to try", img: "media/cast/feature-free.webp", text: "The sunny iPhone and the gym bro in full, plus a taste of the grumpy one. Then $0.99 per character, or unlock everyone at once. No subscription, no ads, no account." },
     ],
     faq: [
       { q: "It doesn't speak when I open my phone.", a: "Open Hello Duo and follow the guide: it adds two Shortcuts automations, one for unfolding and one for folding. Settings shows a tick next to each once it has run. To hear it every time, choose “Every time” in Settings › When it speaks › How often." },

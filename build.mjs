@@ -285,7 +285,7 @@ ${gnav(root, a.slug, a.theme === "dark")}
       </div>
       <div class="cast">
         ${a.cast.map((c, i) => `
-        <article class="cast-card reveal${i === 0 ? " star" : ""}" style="--c:${c.color};--d:${(i % 4) * 0.06}s">
+        <article class="cast-card reveal" style="--c:${c.color};--d:${(i % 7) * 0.05}s">
           <img src="${A(c.img)}" alt="${esc(c.name)}" loading="lazy" width="200" height="200">
           <h3>${esc(c.name)}</h3>
           <ul>${c.lines.map((l, j) => `<li><span>${["Unfold", "Fold", "Unlock"][j] || ""}</span>“${esc(l)}”</li>`).join("")}</ul>
@@ -294,11 +294,12 @@ ${gnav(root, a.slug, a.theme === "dark")}
     </div>
   </section>` : ""}
 
+  ${a.statement ? `
   <section class="section">
     <div class="wrap">
       <p class="statement">${esc(a.statement)}</p>
     </div>
-  </section>
+  </section>` : ""}
 
   ${a.quotes ? `
   <section class="section tight">
@@ -318,8 +319,9 @@ ${gnav(root, a.slug, a.theme === "dark")}
       </div>
       <div class="features">
         ${a.features.map((f, i) => `
-        <article class="feature reveal" style="--d:${(i % 2) * 0.1}s">
+        <article class="feature reveal${f.img ? " has-img" : ""}" style="--d:${(i % 2) * 0.1}s">
           <span class="num">0${i + 1}</span>
+          ${f.img ? `<img src="${A(f.img)}" alt="" loading="lazy">` : ""}
           <h3 class="h3">${esc(f.title)}</h3>
           <p class="muted">${esc(f.text)}</p>
         </article>`).join("")}
